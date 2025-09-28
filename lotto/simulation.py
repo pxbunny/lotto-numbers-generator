@@ -1,5 +1,6 @@
 import datetime
 from typing import Iterator
+
 import pandas as pd
 
 from .algorithms.random_data import generate_numbers
@@ -14,18 +15,18 @@ class BacktestEngine:
     def history(self) -> list[GameHistoryRecord]:
         return self._history
 
-    def run(
-        self,
-        data: pd.DataFrame,
-        use_lotto_numbers: bool = True,
-        use_plus_numbers: bool = True
-    ) -> Iterator[GameHistoryRecord]:
+    def run(self, data: pd.DataFrame, skip_plus: bool = False) -> list[GameHistoryRecord]:
+        return list(self.results_gen(data, skip_plus))
+
+    def results_gen(self, data: pd.DataFrame, skip_plus: bool = False) -> Iterator[GameHistoryRecord]:
+        self._history = []
+
         for index, row in data.iterrows():
             generated_numbers = generate_numbers()
 
             datasets = [
-                (use_lotto_numbers, GameType.LOTTO, row['LottoNumbers']),
-                (use_plus_numbers, GameType.LOTTO_PLUS, row['PlusNumbers'])
+                (True, GameType.LOTTO, row['LottoNumbers']),
+                (not skip_plus, GameType.LOTTO_PLUS, row['PlusNumbers'])
             ]
 
             for _, game_type, draw_result in [dataset for dataset in datasets if dataset[0]]:
