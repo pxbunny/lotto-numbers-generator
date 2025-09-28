@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+echo "🚀 Running pre-commit hook 🚀"
+
+files=$(git diff --cached --name-only --diff-filter=d "*.py")
+
+if [ -n "$files" ]; then
+  echo -e "\n✨ Sorting imports..."
+  isort $files
+  git add $files
+fi
+
+echo -e "\n🎉 Pre-commit status: success 🎉\n"
