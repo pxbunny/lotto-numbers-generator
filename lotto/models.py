@@ -9,6 +9,13 @@ class GameType(Enum):
 
 
 @dataclass
+class LottoDrawRecord:
+    draw_date: datetime
+    lotto_numbers: list[int]
+    plus_numbers: list[int]
+
+
+@dataclass
 class GameHistoryRecord:
     # draw_system_id: int
     game_type: GameType
