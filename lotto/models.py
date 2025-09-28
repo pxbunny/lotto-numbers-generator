@@ -14,5 +14,5 @@ class GameHistoryRecord:
     game_type: GameType
     draw_date: datetime
     draw_result: list[int]
-    selected_numbers: list[int]
-    number_of_matches: int
+    generated_numbers: list[int]
+    matches: int
