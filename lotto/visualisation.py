@@ -17,13 +17,16 @@ def visualise_results(history: list[GameHistoryRecord]) -> None:
 
     fig.update_layout(
         hovermode='x unified',
-        title='Game Results',
+        title='Lotto & Lotto Plus draw results',
         legend={'groupclick': 'toggleitem'},
-        yaxis1_title='lotto matches',
-        yaxis2_title='plus matches',
         xaxis2_title='draw date',
+        yaxis1_title='lotto matches',
+        yaxis2_title='lotto plus matches',
+        yaxis1_range=[0, 6],
+        yaxis2_range=[0, 6],
         template=TEMPLATE,
-        paper_bgcolor=BACKGROUND_COLOR
+        paper_bgcolor=BACKGROUND_COLOR,
+        showlegend=False
     )
 
     lotto_history = [record for record in history if record.game_type == GameType.LOTTO]
@@ -40,5 +43,13 @@ def visualise_results(history: list[GameHistoryRecord]) -> None:
         y=[record.matches for record in plus_history],
         name='plus matches'
     ), row=2, col=1)
+
+    day_as_ms = 86400000
+    min_date = min([record.draw_date for record in history])
+    max_date = max([record.draw_date for record in history])
+    years_range = max_date.year - min_date.year
+
+    if years_range > 2:
+        fig.update_traces(width=day_as_ms * years_range / 2)
 
     fig.show(config=DEFAULT_CONFIG, post_script=[JAVASCRIPT])
