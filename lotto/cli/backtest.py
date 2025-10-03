@@ -1,8 +1,6 @@
 import typer
 
-from ..data.api_mock import get_data
-from ..metrics import MetricsCalculator
-from ..models import GameType
+from ..data.api import get_data
 from ..simulation import BacktestEngine
 from ..visualisation import visualise_results
 

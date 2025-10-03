@@ -162,5 +162,6 @@ cython_debug/
 .idea/
 
 # Custom
-data.csv
+**/data/*.csv
+**/data/config.py
 todos.txt
