@@ -1,8 +1,12 @@
-# lotto-numbers-generator
+# Lotto Numbers Generator
+
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+
 
 ## requirements
 
 python 3.12 or higher
+
 
 ## githooks setup
 
