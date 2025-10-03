@@ -2,6 +2,8 @@
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
+Uses [Lotto API](https://github.com/pxbunny/lotto-api) as a data source.
+
 
 ## requirements
 
