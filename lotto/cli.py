@@ -1,38 +1,107 @@
+from functools import reduce
+
 import typer
+from rich.columns import Columns
+from rich.console import Console
+from rich.progress import track
+from rich.table import Table
+from typing_extensions import Annotated
 
 from . import api
+from .core import GameType
+from .helpers import is_date_str_valid
+from .metrics import BacktestReport, MetricsCalculator
+from .settings import config
 from .simulation import BacktestEngine
 from .visualisation import visualise_results
 
 app = typer.Typer(add_completion=False)
+console = Console()
+
+
+def _validate_date_options(date_from: str | None, date_to: str | None) -> None:
+    if date_from and not is_date_str_valid(date_from):
+        raise typer.BadParameter(f'Invalid date format for --date-from. Expected format: {config.app.date_format}')
+    if date_to and not is_date_str_valid(date_to):
+        raise typer.BadParameter(f'Invalid date format for --date-to. Expected format: {config.app.date_format}')
+
+
+def _get_metrics_table(title: str, report: BacktestReport) -> Table:
+    table = Table(title=title)
+    table.add_column('Metric', style='cyan', no_wrap=True)
+    table.add_column('Value', style='magenta', justify='right')
+
+    ba = report.basic_accuracy
+
+    table.add_row('total_draws', f'{ba.total_draws:.2f}')
+    table.add_row('hit_rate', f'{ba.hit_rate:.2f}')
+    table.add_row('max_streak', f'{ba.max_streak:.2f}')
+    table.add_row('average_hits_per_bet', f'{ba.average_hits_per_bet:.2f}')
+    table.add_section()
+
+    mm = report.monetary_metrics
+
+    table.add_row('total_winnings', f'{mm.total_winnings:.2f}')
+    table.add_row('total_cost', f'{mm.total_cost:.2f}')
+    table.add_row('net_profit', f'{mm.net_profit:.2f}')
+    table.add_row('roi_pct', f'{mm.roi_pct:.2f}')
+    table.add_row('expected_value', f'{mm.expected_value:.2f}')
+    table.add_row('variance_of_returns', f'{mm.variance_of_returns:.2f}')
+    table.add_row('max_drawdown', f'{mm.max_drawdown:.2f}')
+    table.add_section()
+
+    sq = report.statistical_quality
+
+    table.add_row('coverage', f'{sq.coverage:.2f}')
+    table.add_row('coverage_pct', f'{sq.coverage_pct:.2f}')
+    table.add_row('chi_square_pvalue', f'{sq.chi_square_pvalue:.2f}')
+    table.add_row('entropy', f'{sq.entropy:.2f}')
+    table.add_row('average_sum', f'{sq.average_sum:.2f}')
+    table.add_row('sum_std_dev', f'{sq.sum_std_dev:.2f}')
+
+    return table
 
 
 @app.command()
-def run_backtest(skip_plus: bool = False):
+def run_backtest(
+    date_from: Annotated[str, typer.Option('--date-from')] = None,
+    date_to: Annotated[str, typer.Option('--date-to')] = None,
+    top: Annotated[int, typer.Option('--top', min=1)] = None,
+) -> None:
+    _validate_date_options(date_from, date_to)
+
+    with console.status('Fetching data', spinner='bouncingBar'):
+        data = api.get_draw_results(date_from, date_to, top)
+
     backtest = BacktestEngine()
-    data = api.get_draw_results('2022-01-01', '2022-12-31', 10)
-    backtest.run(data, skip_plus)
+    results_iterator = backtest.results_gen(data)
+    backtest_iterations = reduce(lambda x, y: x + (2 if y.plus_numbers else 1), data, 0)
+    results = []
 
-    # metrics_calculator = MetricsCalculator(backtest.history)
-    # lotto_metrics = metrics_calculator.generate_report(GameType.LOTTO)
-    # lotto_plus_metrics = metrics_calculator.generate_report(GameType.LOTTO_PLUS)
+    for result in track(results_iterator, 'Backtest', backtest_iterations, console=console):
+        results.append(result)
 
-    # print(f'Basic metrics for Lotto: {lotto_metrics.basic_accuracy}')
-    # print(f'Basic metrics for Lotto Plus: {lotto_plus_metrics.basic_accuracy}')
+    metrics_calculator = MetricsCalculator(backtest.history)
+    lotto_metrics = metrics_calculator.generate_report(GameType.LOTTO)
+    lotto_plus_metrics = metrics_calculator.generate_report(GameType.LOTTO_PLUS)
 
-    # print(f'Monetary metrics for Lotto: {lotto_metrics.monetary_metrics}')
-    # print(f'Monetary metrics for Lotto Plus: {lotto_plus_metrics.monetary_metrics}')
+    lotto_table = _get_metrics_table('Lotto - metrics', lotto_metrics)
+    lotto_plus_table = _get_metrics_table('Lotto Plus - metrics', lotto_plus_metrics)
 
-    # print(f'Statistical quality metrics for Lotto: {lotto_metrics.statistical_quality}')
-    # print(f'Statistical quality metrics for Lotto Plus: {lotto_plus_metrics.statistical_quality}')
+    console.print()
+    console.print(Columns([lotto_table, lotto_plus_table]))
+    console.print()
 
-    visualise_results(backtest.history)
+    visualise_results(results)
 
 
 @app.command()
-def test():
-    print('Test command works!')
+def generate_numbers() -> None:
+    from .algorithms.random_data import generate_numbers
+
+    numbers = generate_numbers()
+    console.print(f'Generated numbers: [bold green]{", ".join(map(str, numbers))}[/]')
 
 
-def run_app():
+def run_app() -> None:
     app()

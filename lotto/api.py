@@ -7,11 +7,11 @@ from .core import LottoDrawRecord
 from .settings import config
 
 
-def get_draw_results(date_from: str, date_to: str, top: int) -> list[LottoDrawRecord]:
+def get_draw_results(date_from: str | None, date_to: str | None, top: int | None) -> list[LottoDrawRecord]:
     url = _build_url('/api/draw-results')
 
     headers = {'Accept': 'application/json', 'x-functions-key': config.api.api_key}
-    params = {'date_from': date_from, 'date_to': date_to, 'top': top}
+    params = {'dateFrom': date_from, 'dateTo': date_to, 'top': top}
 
     response = requests.get(url, params, headers=headers, timeout=config.api.timeout_sec)
     response.raise_for_status()

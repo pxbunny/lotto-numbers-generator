@@ -13,24 +13,21 @@ class BacktestEngine:
     def history(self) -> list[GameHistoryRecord]:
         return self._history
 
-    def run(self, data: list[LottoDrawRecord], skip_plus: bool = False) -> list[GameHistoryRecord]:
-        return list(self.results_gen(data, skip_plus))
+    def run(self, data: list[LottoDrawRecord]) -> list[GameHistoryRecord]:
+        return list(self.results_gen(data))
 
-    def results_gen(self, data: list[LottoDrawRecord], skip_plus: bool = False) -> Iterator[GameHistoryRecord]:
+    def results_gen(self, data: list[LottoDrawRecord]) -> Iterator[GameHistoryRecord]:
         self._history = []
 
         for record in data:
             generated_numbers = generate_numbers()
 
-            use_lotto_numbers = True
-            use_plus_numbers = not skip_plus
-
             datasets = [
-                (use_lotto_numbers, GameType.LOTTO, record.lotto_numbers),
-                (use_plus_numbers, GameType.LOTTO_PLUS, record.plus_numbers),
+                (GameType.LOTTO, record.lotto_numbers),
+                (GameType.LOTTO_PLUS, record.plus_numbers),
             ]
 
-            for _, game_type, draw_result in [dataset for dataset in datasets if dataset[0]]:
+            for game_type, draw_result in datasets:
                 yield self._handle_game(record.draw_date, game_type, draw_result, generated_numbers)
 
     def _handle_game(
