@@ -1,6 +1,6 @@
 import typer
 
-from ..data.api import get_data
+from ..data import api
 from ..simulation import BacktestEngine
 from ..visualisation import visualise_results
 
@@ -10,7 +10,7 @@ app = typer.Typer()
 @app.command(name='run')
 def run_backtest(skip_plus: bool = False):
     backtest = BacktestEngine()
-    data = get_data()
+    data = api.get_draw_results('2022-01-01', '2022-12-31', 10)
     backtest.run(data, skip_plus)
 
     # metrics_calculator = MetricsCalculator(backtest.history)
