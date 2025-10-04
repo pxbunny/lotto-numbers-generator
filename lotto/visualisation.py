@@ -10,10 +10,7 @@ TEMPLATE = 'plotly_dark'
 
 
 def visualise_results(history: list[GameHistoryRecord]) -> None:
-    fig = make_subplots(
-        rows=2,
-        shared_xaxes=True
-    )
+    fig = make_subplots(rows=2, shared_xaxes=True)
 
     fig.update_layout(
         hovermode='x unified',
@@ -26,23 +23,31 @@ def visualise_results(history: list[GameHistoryRecord]) -> None:
         yaxis2_range=[0, 6],
         template=TEMPLATE,
         paper_bgcolor=BACKGROUND_COLOR,
-        showlegend=False
+        showlegend=False,
     )
 
     lotto_history = [record for record in history if record.game_type == GameType.LOTTO]
     plus_history = [record for record in history if record.game_type == GameType.LOTTO_PLUS]
 
-    fig.add_trace(go.Bar(
-        x=[record.draw_date for record in lotto_history],
-        y=[record.matches for record in lotto_history],
-        name='lotto matches'
-    ), row=1, col=1)
+    fig.add_trace(
+        go.Bar(
+            x=[record.draw_date for record in lotto_history],
+            y=[record.matches for record in lotto_history],
+            name='lotto matches',
+        ),
+        row=1,
+        col=1,
+    )
 
-    fig.add_trace(go.Bar(
-        x=[record.draw_date for record in plus_history],
-        y=[record.matches for record in plus_history],
-        name='plus matches'
-    ), row=2, col=1)
+    fig.add_trace(
+        go.Bar(
+            x=[record.draw_date for record in plus_history],
+            y=[record.matches for record in plus_history],
+            name='plus matches',
+        ),
+        row=2,
+        col=1,
+    )
 
     day_as_ms = 86400000
     min_date = min([record.draw_date for record in history])

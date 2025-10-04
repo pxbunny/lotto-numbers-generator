@@ -56,10 +56,7 @@ class MetricsCalculator:
         GameType.LOTTO_PLUS: {1: 0, 2: 0, 3: 20, 4: 180, 5: 4500, 6: 1000000},
     }
 
-    TICKET_COSTS = {
-        GameType.LOTTO: 3.0,
-        GameType.LOTTO_PLUS: 1.0
-    }
+    TICKET_COSTS = {GameType.LOTTO: 3.0, GameType.LOTTO_PLUS: 1.0}
 
     def __init__(self, records: Iterable[GameHistoryRecord]):
         self._lotto_records = [r for r in records if r.game_type == GameType.LOTTO]
@@ -69,7 +66,7 @@ class MetricsCalculator:
         return BacktestReport(
             basic_accuracy=self.calculate_basic_metrics(game_type),
             monetary_metrics=self.calculate_monetary_metrics(game_type),
-            statistical_quality=self.calculate_statistical_metrics(game_type)
+            statistical_quality=self.calculate_statistical_metrics(game_type),
         )
 
     def calculate_basic_metrics(self, game_type: GameType) -> BasicMetrics:
@@ -88,7 +85,7 @@ class MetricsCalculator:
             max_streak=max_streak,
             average_hits_per_bet=average_hits,
             match_distribution=match_distribution,
-            match_distribution_pct={k: v / total_draws for k, v in match_distribution.items()}
+            match_distribution_pct={k: v / total_draws for k, v in match_distribution.items()},
         )
 
     def calculate_monetary_metrics(self, game_type: GameType) -> MonetaryMetrics:
@@ -119,7 +116,7 @@ class MetricsCalculator:
             expected_value=expected_value,
             variance_of_returns=variance,
             max_drawdown=max_drawdown,
-            winning_distribution=Counter(winnings)
+            winning_distribution=Counter(winnings),
         )
 
     def calculate_statistical_metrics(self, game_type: GameType) -> StatisticalMetrics:
@@ -153,9 +150,7 @@ class MetricsCalculator:
             entropy=entropy,
             average_sum=avg_sum,
             sum_std_dev=sum_std,
-            parity_distribution={
-                f'{even}/{odd}': count for (even, odd), count in parity_dist.items()
-            }
+            parity_distribution={f'{even}/{odd}': count for (even, odd), count in parity_dist.items()},
         )
 
     def _calculate_max_streak(self, matches: list[int], min_hits: int = 1) -> int:

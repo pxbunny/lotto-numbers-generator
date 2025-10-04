@@ -1,6 +1,6 @@
 {
   "recommendations": [
-    "ms-python.pylint",
+    "charliermarsh.ruff",
     "ms-python.python"
   ]
 }

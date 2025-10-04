@@ -27,7 +27,7 @@ class BacktestEngine:
 
             datasets = [
                 (use_lotto_numbers, GameType.LOTTO, record.lotto_numbers),
-                (use_plus_numbers, GameType.LOTTO_PLUS, record.plus_numbers)
+                (use_plus_numbers, GameType.LOTTO_PLUS, record.plus_numbers),
             ]
 
             for _, game_type, draw_result in [dataset for dataset in datasets if dataset[0]]:
@@ -38,17 +38,17 @@ class BacktestEngine:
         draw_date: datetime.date,
         game_type: GameType,
         draw_result: list[int],
-        generated_numbers: list[int] | None = None
+        generated_numbers: list[int] | None = None,
     ) -> GameHistoryRecord:
         generated_numbers = generated_numbers or generate_numbers()
         matches = self._count_matches(draw_result, generated_numbers)
 
         new_record = GameHistoryRecord(
-            game_type,
-            draw_date,
-            draw_result,
-            generated_numbers,
-            matches
+            game_type=game_type,
+            draw_date=draw_date,
+            draw_result=draw_result,
+            generated_numbers=generated_numbers,
+            matches=matches,
         )
 
         self._history.append(new_record)
