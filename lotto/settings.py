@@ -13,7 +13,7 @@ class AppConfig:
 class ApiConfig:
     base_url: str = ''
     api_key: str = ''
-    timeout_sec: int = 30
+    timeout: int = 30
 
 
 @dataclass

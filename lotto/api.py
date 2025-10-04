@@ -13,7 +13,7 @@ def get_draw_results(date_from: str | None, date_to: str | None, top: int | None
     headers = {'Accept': 'application/json', 'x-functions-key': config.api.api_key}
     params = {'dateFrom': date_from, 'dateTo': date_to, 'top': top}
 
-    response = requests.get(url, params, headers=headers, timeout=config.api.timeout_sec)
+    response = requests.get(url, params, headers=headers, timeout=config.api.timeout)
     response.raise_for_status()
 
     return [_map_record(record) for record in response.json()]
