@@ -1,3 +1,4 @@
+from datetime import datetime
 from functools import reduce
 
 import typer
@@ -9,7 +10,6 @@ from typing_extensions import Annotated
 
 from . import api
 from .core import GameType
-from .helpers import is_date_str_valid
 from .metrics import BacktestReport, MetricsCalculator
 from .settings import config
 from .simulation import BacktestEngine
@@ -19,10 +19,18 @@ app = typer.Typer(add_completion=False)
 console = Console()
 
 
+def _is_date_str_valid(date_str: str) -> bool:
+    try:
+        datetime.strptime(date_str, config.app.date_format)
+        return True
+    except ValueError:
+        return False
+
+
 def _validate_date_options(date_from: str | None, date_to: str | None) -> None:
-    if date_from and not is_date_str_valid(date_from):
+    if date_from and not _is_date_str_valid(date_from):
         raise typer.BadParameter(f'Invalid date format for --date-from. Expected format: {config.app.date_format}')
-    if date_to and not is_date_str_valid(date_to):
+    if date_to and not _is_date_str_valid(date_to):
         raise typer.BadParameter(f'Invalid date format for --date-to. Expected format: {config.app.date_format}')
 
 
