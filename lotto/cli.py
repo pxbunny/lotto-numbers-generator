@@ -1,13 +1,13 @@
 import typer
 
-from ..data import api
-from ..simulation import BacktestEngine
-from ..visualisation import visualise_results
+from . import api
+from .simulation import BacktestEngine
+from .visualisation import visualise_results
 
-app = typer.Typer()
+app = typer.Typer(add_completion=False)
 
 
-@app.command(name='run')
+@app.command()
 def run_backtest(skip_plus: bool = False):
     backtest = BacktestEngine()
     data = api.get_draw_results('2022-01-01', '2022-12-31', 10)
@@ -27,3 +27,12 @@ def run_backtest(skip_plus: bool = False):
     # print(f'Statistical quality metrics for Lotto Plus: {lotto_plus_metrics.statistical_quality}')
 
     visualise_results(backtest.history)
+
+
+@app.command()
+def test():
+    print('Test command works!')
+
+
+def run_app():
+    app()

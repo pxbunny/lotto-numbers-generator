@@ -2,7 +2,7 @@ import datetime
 from typing import Iterator
 
 from .algorithms.random_data import generate_numbers
-from .models import GameHistoryRecord, GameType, LottoDrawRecord
+from .core import GameHistoryRecord, GameType, LottoDrawRecord
 
 
 class BacktestEngine:

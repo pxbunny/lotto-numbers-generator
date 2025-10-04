@@ -6,7 +6,7 @@ from typing import Iterable
 
 from scipy.stats import chisquare
 
-from .models import GameHistoryRecord, GameType
+from .core import GameHistoryRecord, GameType
 
 
 @dataclass

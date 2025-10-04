@@ -3,8 +3,8 @@ from typing import Any
 
 import requests
 
-from ..models import LottoDrawRecord
-from ..settings import config
+from .core import LottoDrawRecord
+from .settings import config
 
 
 def get_draw_results(date_from: str, date_to: str, top: int) -> list[LottoDrawRecord]:

@@ -1,8 +1,4 @@
-import typer
-
-from .cli import backtest
+from .cli import run_app
 
 if __name__ == '__main__':
-    app = typer.Typer(add_completion=False)
-    app.add_typer(backtest.app, name='backtest')
-    app()
+    run_app()

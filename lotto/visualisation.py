@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from .models import GameHistoryRecord, GameType
+from .core import GameHistoryRecord, GameType
 
 BACKGROUND_COLOR = '#111111'
 DEFAULT_CONFIG = {'displaylogo': False}
