@@ -83,10 +83,10 @@ def run_backtest(
 
     backtest = BacktestEngine()
     results_iterator = backtest.results_gen(data)
-    backtest_iterations = reduce(lambda x, y: x + (2 if y.plus_numbers else 1), data, 0)
+    total_games = reduce(lambda x, y: x + (2 if y.plus_numbers else 1), data, 0)
     results = []
 
-    for result in track(results_iterator, 'Backtest', backtest_iterations, console=console):
+    for result in track(results_iterator, 'Backtest', total_games, console=console):
         results.append(result)
 
     metrics_calculator = MetricsCalculator(backtest.history)
