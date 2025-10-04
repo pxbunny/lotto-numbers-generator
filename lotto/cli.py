@@ -15,8 +15,8 @@ from .settings import config
 from .simulation import BacktestEngine
 from .visualisation import visualise_results
 
-app = typer.Typer(add_completion=False)
-console = Console()
+_app = typer.Typer(add_completion=False)
+_console = Console()
 
 
 def _is_date_str_valid(date_str: str) -> bool:
@@ -70,7 +70,7 @@ def _get_metrics_table(title: str, report: BacktestReport) -> Table:
     return table
 
 
-@app.command()
+@_app.command()
 def run_backtest(
     date_from: Annotated[str, typer.Option('--date-from')] = None,
     date_to: Annotated[str, typer.Option('--date-to')] = None,
@@ -78,7 +78,7 @@ def run_backtest(
 ) -> None:
     _validate_date_options(date_from, date_to)
 
-    with console.status('Fetching data', spinner='bouncingBar'):
+    with _console.status('Fetching data', spinner='bouncingBar'):
         data = api.get_draw_results(date_from, date_to, top)
 
     backtest = BacktestEngine()
@@ -86,7 +86,7 @@ def run_backtest(
     total_games = reduce(lambda x, y: x + (2 if y.plus_numbers else 1), data, 0)
     results = []
 
-    for result in track(results_iterator, 'Backtest', total_games, console=console):
+    for result in track(results_iterator, 'Backtest', total_games, console=_console):
         results.append(result)
 
     metrics_calculator = MetricsCalculator(backtest.history)
@@ -96,20 +96,20 @@ def run_backtest(
     lotto_table = _get_metrics_table('Lotto - metrics', lotto_metrics)
     lotto_plus_table = _get_metrics_table('Lotto Plus - metrics', lotto_plus_metrics)
 
-    console.print()
-    console.print(Columns([lotto_table, lotto_plus_table]))
-    console.print()
+    _console.print()
+    _console.print(Columns([lotto_table, lotto_plus_table]))
+    _console.print()
 
     visualise_results(results)
 
 
-@app.command()
+@_app.command()
 def generate_numbers() -> None:
     from .algorithms.random_data import generate_numbers
 
     numbers = generate_numbers()
-    console.print(f'Generated numbers: [bold green]{", ".join(map(str, numbers))}[/]')
+    _console.print(f'Generated numbers: [bold green]{", ".join(map(str, numbers))}[/]')
 
 
 def run_app() -> None:
-    app()
+    _app()

@@ -16,7 +16,7 @@ class LottoDrawRecord:
 
 
 @dataclass
-class GameHistoryRecord:
+class GameRecord:
     game_type: GameType
     draw_date: datetime
     draw_result: list[int]

@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from .core import GameHistoryRecord, GameType
+from .core import GameRecord, GameType
 
 BACKGROUND_COLOR = '#111111'
 DEFAULT_CONFIG = {'displaylogo': False}
@@ -9,7 +9,7 @@ JAVASCRIPT = f'''document.body.style.backgroundColor = "{BACKGROUND_COLOR}";'''
 TEMPLATE = 'plotly_dark'
 
 
-def visualise_results(history: list[GameHistoryRecord]) -> None:
+def visualise_results(history: list[GameRecord]) -> None:
     fig = make_subplots(rows=2, shared_xaxes=True)
 
     fig.update_layout(

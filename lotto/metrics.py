@@ -6,7 +6,7 @@ from typing import Iterable
 
 from scipy.stats import chisquare
 
-from .core import GameHistoryRecord, GameType
+from .core import GameRecord, GameType
 
 
 @dataclass
@@ -58,7 +58,7 @@ class MetricsCalculator:
 
     TICKET_COSTS = {GameType.LOTTO: 3.0, GameType.LOTTO_PLUS: 1.0}
 
-    def __init__(self, records: Iterable[GameHistoryRecord]):
+    def __init__(self, records: Iterable[GameRecord]):
         self._lotto_records = [r for r in records if r.game_type == GameType.LOTTO]
         self._lotto_plus_records = [r for r in records if r.game_type == GameType.LOTTO_PLUS]
 
@@ -185,5 +185,5 @@ class MetricsCalculator:
         entropy = -sum(p * math.log2(p) for p in probabilities if p > 0)
         return entropy
 
-    def _get_records_for_game_type(self, game_type: GameType) -> list[GameHistoryRecord]:
+    def _get_records_for_game_type(self, game_type: GameType) -> list[GameRecord]:
         return self._lotto_records if game_type == GameType.LOTTO else self._lotto_plus_records

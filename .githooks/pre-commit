@@ -10,6 +10,7 @@ if [ -n "$files" ]; then
   echo -e "\n✨ Sorting imports..."
   ruff check --select I --fix $files
   git add $files
+  ruff format $files
 fi
 
 echo -e "\n🎉 Pre-commit status: success 🎉\n"
