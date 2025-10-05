@@ -15,7 +15,7 @@ from .settings import config
 from .simulation import BacktestEngine
 from .visualisation import visualise_results
 
-_app = typer.Typer(add_completion=False)
+_app = typer.Typer(name=config.app.name, add_completion=False, no_args_is_help=True)
 _console = Console()
 
 

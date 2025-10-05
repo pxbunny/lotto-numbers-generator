@@ -6,6 +6,7 @@ CONFIG_PATH = 'config.json'
 
 @dataclass
 class AppConfig:
+    name: str = 'lotto'
     date_format: str = '%Y-%m-%d'
 
 

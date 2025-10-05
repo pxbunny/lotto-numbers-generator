@@ -1,5 +1,6 @@
 {
   "app": {
+    "name": "lotto",
     "date_format": "%Y-%m-%d"
   },
   "api": {
