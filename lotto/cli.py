@@ -8,7 +8,7 @@ from rich.progress import track
 from rich.table import Table
 from typing_extensions import Annotated
 
-from . import api
+from . import lotto_client
 from .core import GameType
 from .metrics import BacktestReport, MetricsCalculator
 from .settings import config
@@ -79,7 +79,7 @@ def run_backtest(
     _validate_date_options(date_from, date_to)
 
     with _console.status('Fetching data', spinner='bouncingBar'):
-        data = api.get_draw_results(date_from, date_to, top)
+        data = lotto_client.get_draw_results(date_from, date_to, top)
 
     backtest = BacktestEngine()
     results_iterator = backtest.results_gen(data)

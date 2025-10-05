@@ -11,9 +11,11 @@ def get_draw_results(date_from: str | None, date_to: str | None, top: int | None
     url = _build_url('/api/draw-results')
 
     headers = {'Accept': 'application/json', 'x-functions-key': config.api.api_key}
-    params = {'dateFrom': date_from, 'dateTo': date_to, 'top': top}
 
-    response = requests.get(url, params, headers=headers, timeout=config.api.timeout)
+    params = {'dateFrom': date_from, 'dateTo': date_to, 'top': top}
+    params = {k: v for k, v in params.items() if v is not None}
+
+    response = requests.get(url, params=params, headers=headers, timeout=config.api.timeout)
     response.raise_for_status()
 
     return [_map_record(record) for record in response.json()]
