@@ -9,7 +9,7 @@ from rich.table import Table
 from typing_extensions import Annotated
 
 from . import lotto_client
-from .core import GameType
+from .core import AlgorithmFactory, GameType
 from .metrics import BacktestReport, MetricsCalculator
 from .settings import config
 from .simulation import BacktestEngine
@@ -72,6 +72,8 @@ def _get_metrics_table(title: str, report: BacktestReport) -> Table:
 
 @_app.command()
 def run_backtest(
+    algorithm: Annotated[str, typer.Option('--algorithm', '-a')],
+    param: Annotated[list[str], typer.Option('--param', '-p')] = [],
     date_from: Annotated[str, typer.Option('--date-from')] = None,
     date_to: Annotated[str, typer.Option('--date-to')] = None,
     top: Annotated[int, typer.Option('--top', min=1)] = None,
@@ -81,7 +83,13 @@ def run_backtest(
     with _console.status('Fetching data', spinner='bouncingBar'):
         data = lotto_client.get_draw_results(date_from, date_to, top)
 
-    backtest = BacktestEngine()
+    params = {k: v for k, v in (param_item.split('=', 1) for param_item in param)}
+
+    algorithm_factory = AlgorithmFactory(data)
+    algorithm = algorithm_factory.select(algorithm, params)
+
+    backtest = BacktestEngine(algorithm)
+
     results_iterator = backtest.results_gen(data)
     total_games = reduce(lambda x, y: x + (2 if y.plus_numbers else 1), data, 0)
     results = []
@@ -104,10 +112,24 @@ def run_backtest(
 
 
 @_app.command()
-def generate_numbers() -> None:
-    from .algorithms.random_data import generate_numbers
+def generate_numbers(
+    algorithm: Annotated[str, typer.Option('--algorithm', '-a')],
+    param: Annotated[list[str], typer.Option('--param', '-p')] = [],
+    date_from: Annotated[str, typer.Option('--date-from')] = None,
+    date_to: Annotated[str, typer.Option('--date-to')] = None,
+    top: Annotated[int, typer.Option('--top', min=1)] = 100,
+) -> None:
+    _validate_date_options(date_from, date_to)
 
-    numbers = generate_numbers()
+    with _console.status('Fetching data', spinner='bouncingBar'):
+        data = lotto_client.get_draw_results(date_from, date_to, top)
+
+    params = {k: v for k, v in (param_item.split('=', 1) for param_item in param)}
+
+    algorithm_factory = AlgorithmFactory(data)
+    algorithm = algorithm_factory.select(algorithm, params)
+
+    numbers = algorithm.generate_numbers()
     _console.print(f'Generated numbers: [bold green]{", ".join(map(str, numbers))}[/]')
 
 

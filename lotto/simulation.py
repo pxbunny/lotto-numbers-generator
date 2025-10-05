@@ -1,13 +1,13 @@
 import datetime
 from typing import Iterator
 
-from .algorithms.random_data import generate_numbers
-from .core import GameRecord, GameType, LottoDrawRecord
+from .core import AbstractAlgorithm, GameRecord, GameType, LottoDrawRecord
 
 
 class BacktestEngine:
-    def __init__(self):
+    def __init__(self, algorithm: AbstractAlgorithm) -> None:
         self._history: list[GameRecord] = []
+        self._algorithm = algorithm
 
     @property
     def history(self) -> list[GameRecord]:
@@ -20,7 +20,7 @@ class BacktestEngine:
         self._history = []
 
         for record in data:
-            generated_numbers = generate_numbers()
+            generated_numbers = self._algorithm.generate_numbers()
 
             datasets = [
                 (GameType.LOTTO, record.lotto_numbers),
@@ -37,7 +37,7 @@ class BacktestEngine:
         draw_result: list[int],
         generated_numbers: list[int] | None = None,
     ) -> GameRecord:
-        generated_numbers = generated_numbers or generate_numbers()
+        generated_numbers = generated_numbers or self._algorithm.generate_numbers()
         matches = self._count_matches(draw_result, generated_numbers)
 
         new_record = GameRecord(

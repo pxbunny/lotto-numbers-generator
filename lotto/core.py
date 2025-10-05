@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, auto
@@ -22,3 +23,32 @@ class GameRecord:
     draw_result: list[int]
     generated_numbers: list[int]
     matches: int
+
+
+class AbstractAlgorithm(ABC):
+    def __init__(self, data: list[LottoDrawRecord], params: dict) -> None:
+        self._data = data
+        self._params = params
+
+    @abstractmethod
+    def generate_numbers(self) -> list[int]:
+        raise NotImplementedError
+
+
+class AlgorithmFactory:
+    _registry: dict[str, type[AbstractAlgorithm]] = {}
+
+    def __init__(self, data: list[LottoDrawRecord]) -> None:
+        self._data = data
+
+    @classmethod
+    def register(self, name: str) -> callable:
+        def wrapper(algorithm_type: type[AbstractAlgorithm]) -> type[AbstractAlgorithm]:
+            self._registry[name] = algorithm_type
+            return algorithm_type
+
+        return wrapper
+
+    def select(self, name: str, params: dict) -> AbstractAlgorithm:
+        algorythm_type = self._registry.get(name)
+        return algorythm_type(self._data, params)
