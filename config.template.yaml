@@ -1,0 +1,8 @@
+app:
+  name: "lotto"
+  date_format: "%Y-%m-%d"
+
+api:
+  base_url: ""
+  api_key: ""
+  timeout: 30

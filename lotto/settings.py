@@ -1,7 +1,8 @@
-import json
 from dataclasses import dataclass, field, fields
 
-CONFIG_PATH = 'config.json'
+import yaml
+
+CONFIG_PATH = 'config.yaml'
 
 
 @dataclass
@@ -25,7 +26,7 @@ class Config:
 
 def load_config(path: str = CONFIG_PATH) -> Config:
     with open(path, encoding='utf-8') as f:
-        d = json.load(f)
+        d = yaml.safe_load(f)
 
     c = Config()
 
