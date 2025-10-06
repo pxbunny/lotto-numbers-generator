@@ -36,24 +36,33 @@ class AbstractAlgorithm(ABC):
 
 
 class AlgorithmFactory:
-    _registry: dict[str, tuple[type[AbstractAlgorithm], bool]] = {}
+    _registry: dict[str, tuple[type[AbstractAlgorithm], bool, bool]] = {}
 
-    def __init__(self, data: list[LottoDrawRecord] = []) -> None:
-        self._data = data
+    def __init__(self, data: list[LottoDrawRecord] | None = None) -> None:
+        self._data = data if data is not None else []
 
     @classmethod
-    def register(self, name: str, requires_data: bool = True) -> callable:
+    def register(cls, name: str, *, requires_data: bool = True, has_params: bool = True) -> callable:
         def wrapper(algorithm_type: type[AbstractAlgorithm]) -> type[AbstractAlgorithm]:
-            self._registry[name] = algorithm_type, requires_data
+            cls._registry[name] = algorithm_type, requires_data, has_params
             return algorithm_type
 
         return wrapper
 
     @classmethod
-    def requires_data(self, name: str) -> bool:
-        _, requires_data = self._registry.get(name)
+    def requires_data(cls, name: str) -> bool:
+        _, requires_data, _ = cls._registry.get(name)
         return requires_data
 
     def select(self, name: str, params: dict) -> AbstractAlgorithm:
-        algorythm_type, requires_data = self._registry.get(name)
-        return algorythm_type(self._data, params) if requires_data else algorythm_type(params)
+        algorithm_type, requires_data, has_params = self._registry.get(name)
+
+        match (requires_data, has_params):
+            case (True, True):
+                return algorithm_type(self._data, params)
+            case (True, False):
+                return algorithm_type(self._data)
+            case (False, True):
+                return algorithm_type(params)
+            case (False, False):
+                return algorithm_type()

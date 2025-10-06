@@ -141,5 +141,5 @@ def generate_numbers(
     _console.print(f'Generated numbers: [bold green]{", ".join(map(str, numbers))}[/]')
 
 
-def run_app() -> None:
+def run_typer_app() -> None:
     _app()
