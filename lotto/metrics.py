@@ -1,8 +1,8 @@
 import math
 import statistics
 from collections import Counter
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 from scipy.stats import chisquare
 
@@ -55,10 +55,12 @@ class MetricsCalculator:
         GameType.LOTTO: {1: 0, 2: 0, 3: 24, 4: 200, 5: 5000, 6: 2000000},
         GameType.LOTTO_PLUS: {1: 0, 2: 0, 3: 20, 4: 180, 5: 4500, 6: 1000000},
     }
+    TICKET_COSTS = {
+        GameType.LOTTO: 3.0,
+        GameType.LOTTO_PLUS: 1.0,
+    }
 
-    TICKET_COSTS = {GameType.LOTTO: 3.0, GameType.LOTTO_PLUS: 1.0}
-
-    def __init__(self, records: Iterable[GameRecord]):
+    def __init__(self, records: Iterable[GameRecord]) -> None:
         self._lotto_records = [r for r in records if r.game_type == GameType.LOTTO]
         self._lotto_plus_records = [r for r in records if r.game_type == GameType.LOTTO_PLUS]
 

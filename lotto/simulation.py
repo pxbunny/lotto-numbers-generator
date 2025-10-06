@@ -1,5 +1,5 @@
 import datetime
-from typing import Iterator
+from collections.abc import Iterator
 
 from .core import AbstractAlgorithm, GameRecord, GameType, LottoDrawRecord
 

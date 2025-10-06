@@ -1,10 +1,16 @@
 from datetime import datetime
-from typing import Any
+from typing import TypedDict, cast
 
 import requests
 
 from .core import LottoDrawRecord
 from .settings import config
+
+
+class RawLottoDrawRecord(TypedDict):
+    draw_date: str
+    lotto_numbers: list[int]
+    plus_numbers: list[int]
 
 
 def get_draw_results(date_from: str | None, date_to: str | None, top: int | None) -> list[LottoDrawRecord]:
@@ -18,10 +24,11 @@ def get_draw_results(date_from: str | None, date_to: str | None, top: int | None
     response = requests.get(url, params=params, headers=headers, timeout=config.api.timeout)
     response.raise_for_status()
 
-    return [_map_record(record) for record in response.json()]
+    body = cast('list[RawLottoDrawRecord]', response.json())
+    return [_map_record(record) for record in body]
 
 
-def _map_record(record: Any) -> LottoDrawRecord:
+def _map_record(record: RawLottoDrawRecord) -> LottoDrawRecord:
     return LottoDrawRecord(
         draw_date=datetime.strptime(record['draw_date'], config.app.date_format).date(),
         lotto_numbers=record['lotto_numbers'],
