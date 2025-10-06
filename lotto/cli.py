@@ -34,7 +34,10 @@ def _validate_date_options(date_from: str | None, date_to: str | None) -> None:
         raise typer.BadParameter(f'Invalid date format for --date-to. Expected format: {config.app.date_format}')
 
 
-def _parse_params(params: str) -> dict[str, str]:
+def _parse_params(params: str | None) -> dict[str, str]:
+    if params is None:
+        return {}
+
     return {k: v for k, v in (param_item.split('=', 1) for param_item in params)}
 
 
@@ -77,10 +80,10 @@ def _get_metrics_table(title: str, report: BacktestReport) -> Table:
 @_app.command()
 def run_backtest(
     algorithm: Annotated[str, typer.Option('--algorithm', '-a')],
-    param: Annotated[list[str], typer.Option('--param', '-p')] = [],
-    date_from: Annotated[str, typer.Option('--date-from')] = None,
-    date_to: Annotated[str, typer.Option('--date-to')] = None,
-    top: Annotated[int, typer.Option('--top', min=1)] = None,
+    param: Annotated[list[str] | None, typer.Option('--param', '-p')] = None,
+    date_from: Annotated[str | None, typer.Option('--date-from')] = None,
+    date_to: Annotated[str | None, typer.Option('--date-to')] = None,
+    top: Annotated[int | None, typer.Option('--top', min=1)] = None,
 ) -> None:
     _validate_date_options(date_from, date_to)
 
@@ -118,9 +121,9 @@ def run_backtest(
 @_app.command()
 def generate_numbers(
     algorithm: Annotated[str, typer.Option('--algorithm', '-a')],
-    param: Annotated[list[str], typer.Option('--param', '-p')] = [],
-    date_from: Annotated[str, typer.Option('--date-from')] = None,
-    date_to: Annotated[str, typer.Option('--date-to')] = None,
+    param: Annotated[list[str] | None, typer.Option('--param', '-p')] = None,
+    date_from: Annotated[str | None, typer.Option('--date-from')] = None,
+    date_to: Annotated[str | None, typer.Option('--date-to')] = None,
     top: Annotated[int, typer.Option('--top', min=1)] = 100,
 ) -> None:
     _validate_date_options(date_from, date_to)
