@@ -34,6 +34,10 @@ def _validate_date_options(date_from: str | None, date_to: str | None) -> None:
         raise typer.BadParameter(f'Invalid date format for --date-to. Expected format: {config.app.date_format}')
 
 
+def _parse_params(params: str) -> dict[str, str]:
+    return {k: v for k, v in (param_item.split('=', 1) for param_item in params)}
+
+
 def _get_metrics_table(title: str, report: BacktestReport) -> Table:
     table = Table(title=title)
     table.add_column('Metric', style='cyan', no_wrap=True)
@@ -83,7 +87,7 @@ def run_backtest(
     with _console.status('Fetching data', spinner='bouncingBar'):
         data = lotto_client.get_draw_results(date_from, date_to, top)
 
-    params = {k: v for k, v in (param_item.split('=', 1) for param_item in param)}
+    params = _parse_params(param)
 
     algorithm_factory = AlgorithmFactory(data)
     algorithm = algorithm_factory.select(algorithm, params)
@@ -121,10 +125,14 @@ def generate_numbers(
 ) -> None:
     _validate_date_options(date_from, date_to)
 
-    with _console.status('Fetching data', spinner='bouncingBar'):
-        data = lotto_client.get_draw_results(date_from, date_to, top)
+    params = _parse_params(param)
+    requires_data = AlgorithmFactory.requires_data(algorithm)
 
-    params = {k: v for k, v in (param_item.split('=', 1) for param_item in param)}
+    if requires_data:
+        with _console.status('Fetching data', spinner='bouncingBar'):
+            data = lotto_client.get_draw_results(date_from, date_to, top)
+    else:
+        data = []
 
     algorithm_factory = AlgorithmFactory(data)
     algorithm = algorithm_factory.select(algorithm, params)
