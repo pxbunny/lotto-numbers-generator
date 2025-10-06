@@ -9,8 +9,10 @@ files=$(git diff --cached --name-only --diff-filter=d "*.py")
 if [ -n "$files" ]; then
   echo -e "\n✨ Sorting imports..."
   ruff check --select I --fix $files
-  ruff check $files
   git add $files
+
+  echo -e "\n✨ Linting and formatting..."
+  ruff check $files
   ruff format $files
 fi
 
