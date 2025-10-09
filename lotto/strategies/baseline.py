@@ -3,8 +3,8 @@ import random
 from ..core import AbstractStrategy, StrategyRegistry
 
 
-@StrategyRegistry.register('random', requires_data=False, has_params=False)
-class Random(AbstractStrategy):
+@StrategyRegistry.register('baseline', requires_data=False, has_params=False)
+class Baseline(AbstractStrategy):
     _POOL_MAX = 49
     _TAKE = 6
 
