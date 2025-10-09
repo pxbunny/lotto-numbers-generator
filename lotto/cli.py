@@ -9,7 +9,7 @@ from rich.progress import track
 from rich.table import Table
 
 from . import lotto_client
-from .core import AlgorithmFactory, GameType
+from .core import GameType, StrategyRegistry
 from .metrics import BacktestReport, MetricsCalculator
 from .settings import config
 from .simulation import BacktestEngine
@@ -79,7 +79,7 @@ def _get_metrics_table(title: str, report: BacktestReport) -> Table:
 
 @_app.command()
 def run_backtest(
-    algorithm: Annotated[str, typer.Option('--algorithm', '-a')],
+    strategy: Annotated[str, typer.Option('--strategy', '-s')],
     param: Annotated[list[str] | None, typer.Option('--param', '-p')] = None,
     date_from: Annotated[str | None, typer.Option('--date-from')] = None,
     date_to: Annotated[str | None, typer.Option('--date-to')] = None,
@@ -92,10 +92,10 @@ def run_backtest(
 
     params = _parse_params(param)
 
-    algorithm_factory = AlgorithmFactory(data)
-    algorithm = algorithm_factory.select(algorithm, params)
+    strategy_registry = StrategyRegistry(data)
+    strategy = strategy_registry.resolve(strategy, params)
 
-    backtest = BacktestEngine(algorithm)
+    backtest = BacktestEngine(strategy)
 
     results_iterator = backtest.results_gen(data)
     total_games = reduce(lambda x, y: x + (2 if y.plus_numbers else 1), data, 0)
@@ -120,7 +120,7 @@ def run_backtest(
 
 @_app.command()
 def generate_numbers(
-    algorithm: Annotated[str, typer.Option('--algorithm', '-a')],
+    strategy: Annotated[str, typer.Option('--strategy', '-s')],
     param: Annotated[list[str] | None, typer.Option('--param', '-p')] = None,
     date_from: Annotated[str | None, typer.Option('--date-from')] = None,
     date_to: Annotated[str | None, typer.Option('--date-to')] = None,
@@ -129,7 +129,7 @@ def generate_numbers(
     _validate_date_options(date_from, date_to)
 
     params = _parse_params(param)
-    requires_data = AlgorithmFactory.requires_data(algorithm)
+    requires_data = StrategyRegistry.requires_data(strategy)
 
     if requires_data:
         with _console.status('Fetching data', spinner='bouncingBar'):
@@ -137,10 +137,10 @@ def generate_numbers(
     else:
         data = []
 
-    algorithm_factory = AlgorithmFactory(data)
-    algorithm = algorithm_factory.select(algorithm, params)
+    strategy_registry = StrategyRegistry(data)
+    strategy = strategy_registry.resolve(strategy, params)
 
-    numbers = algorithm.generate_numbers()
+    numbers = strategy.generate_numbers()
     _console.print(f'Generated numbers: [bold green]{", ".join(map(str, numbers))}[/]')
 
 

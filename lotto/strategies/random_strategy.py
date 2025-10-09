@@ -1,10 +1,10 @@
 import random
 
-from ..core import AbstractAlgorithm, AlgorithmFactory
+from ..core import AbstractStrategy, StrategyRegistry
 
 
-@AlgorithmFactory.register('random', requires_data=False, has_params=False)
-class RandomAlgorithm(AbstractAlgorithm):
+@StrategyRegistry.register('random', requires_data=False, has_params=False)
+class Random(AbstractStrategy):
     _POOL_MAX = 49
     _TAKE = 6
 

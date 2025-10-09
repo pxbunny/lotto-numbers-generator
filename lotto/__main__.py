@@ -12,5 +12,5 @@ def run_modules_discovery(package: str) -> None:
 
 
 if __name__ == '__main__':
-    run_modules_discovery('lotto.algorithms')
+    run_modules_discovery('lotto.strategies')
     run_typer_app()

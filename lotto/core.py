@@ -25,7 +25,7 @@ class GameRecord:
     matches: int
 
 
-class AbstractAlgorithm(ABC):
+class AbstractStrategy(ABC):
     def __init__(self, data: list[LottoDrawRecord], params: dict) -> None:
         self._data = data
         self._params = params
@@ -35,17 +35,17 @@ class AbstractAlgorithm(ABC):
         raise NotImplementedError
 
 
-class AlgorithmFactory:
-    _registry: dict[str, tuple[type[AbstractAlgorithm], bool, bool]] = {}
+class StrategyRegistry:
+    _registry: dict[str, tuple[type[AbstractStrategy], bool, bool]] = {}
 
     def __init__(self, data: list[LottoDrawRecord] | None = None) -> None:
         self._data = data if data is not None else []
 
     @classmethod
     def register(cls, name: str, *, requires_data: bool = True, has_params: bool = True) -> callable:
-        def wrapper(algorithm_type: type[AbstractAlgorithm]) -> type[AbstractAlgorithm]:
-            cls._registry[name] = algorithm_type, requires_data, has_params
-            return algorithm_type
+        def wrapper(strategy_type: type[AbstractStrategy]) -> type[AbstractStrategy]:
+            cls._registry[name] = strategy_type, requires_data, has_params
+            return strategy_type
 
         return wrapper
 
@@ -54,15 +54,15 @@ class AlgorithmFactory:
         _, requires_data, _ = cls._registry.get(name)
         return requires_data
 
-    def select(self, name: str, params: dict) -> AbstractAlgorithm:
-        algorithm_type, requires_data, has_params = self._registry.get(name)
+    def resolve(self, name: str, params: dict) -> AbstractStrategy:
+        strategy_type, requires_data, has_params = self._registry.get(name)
 
         match (requires_data, has_params):
             case (True, True):
-                return algorithm_type(self._data, params)
+                return strategy_type(self._data, params)
             case (True, False):
-                return algorithm_type(self._data)
+                return strategy_type(self._data)
             case (False, True):
-                return algorithm_type(params)
+                return strategy_type(params)
             case (False, False):
-                return algorithm_type()
+                return strategy_type()
