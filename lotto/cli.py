@@ -6,6 +6,7 @@ import typer
 from rich.columns import Columns
 from rich.console import Console
 from rich.progress import track
+from rich.style import Style
 from rich.table import Table
 
 from . import lotto_client
@@ -17,6 +18,9 @@ from .visualisation import visualise_results
 
 _app = typer.Typer(name=config.app.name, add_completion=False, no_args_is_help=True)
 _console = Console()
+
+_spinner_type = 'arc'
+_spinner_style = Style(color='bright_cyan', bold=True)
 
 
 def _is_date_str_valid(date_str: str) -> bool:
@@ -87,7 +91,7 @@ def run_backtest(
 ) -> None:
     _validate_date_options(date_from, date_to)
 
-    with _console.status('Fetching data', spinner='bouncingBar'):
+    with _console.status('Fetching data', spinner=_spinner_type, spinner_style=_spinner_style):
         data = lotto_client.get_draw_results(date_from, date_to, top)
 
     params = _parse_params(param)
@@ -132,7 +136,7 @@ def generate_numbers(
     requires_data = StrategyRegistry.requires_data(strategy)
 
     if requires_data:
-        with _console.status('Fetching data', spinner='bouncingBar'):
+        with _console.status('Fetching data', spinner=_spinner_type, spinner_style=_spinner_style):
             data = lotto_client.get_draw_results(date_from, date_to, top)
     else:
         data = []
