@@ -1,9 +1,9 @@
 import random
 
-from ..core import AbstractStrategy, LottoDrawRecord, StrategyRegistry
+from ..core import AbstractStrategy, LottoDrawRecord, StrategyMetadata, StrategyRegistry
 
 
-@StrategyRegistry.register('baseline', requires_data=False, has_params=False)
+@StrategyRegistry.register('baseline', StrategyMetadata(requires_data=False, has_params=False))
 class Baseline(AbstractStrategy):
     def prepare_data(self, _: list[LottoDrawRecord]) -> None:
         pass

@@ -1,12 +1,17 @@
 from collections import Counter
+from typing import Any
 
 from ..core import AbstractStrategy, LottoDrawRecord, StrategyRegistry
+
+default_params: dict[str, Any] = {
+    'lookback': 100,
+}
 
 
 @StrategyRegistry.register('hot-numbers')
 class HotNumbers(AbstractStrategy):
-    def __init__(self, params: dict) -> None:
-        self._lookback = params.get('lookback')
+    def __init__(self, params: dict[str, str]) -> None:
+        self._lookback = int(params.get('lookback', default_params['lookback']))
         self._data: list[LottoDrawRecord] = []
 
     def prepare_data(self, data: list[LottoDrawRecord]) -> None:

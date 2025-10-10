@@ -38,23 +38,29 @@ class AbstractStrategy(ABC):
         raise NotImplementedError
 
 
+@dataclass
+class StrategyMetadata:
+    requires_data: bool = True
+    has_params: bool = True
+
+
 class StrategyRegistry:
-    _registry: dict[str, tuple[type[AbstractStrategy], bool, bool]] = {}
+    _registry: dict[str, tuple[type[AbstractStrategy], StrategyMetadata]] = {}
 
     @classmethod
-    def register(cls, name: str, *, requires_data: bool = True, has_params: bool = True) -> callable:
+    def register(cls, name: str, metadata: StrategyMetadata | None = None) -> callable:
         def wrapper(strategy_type: type[AbstractStrategy]) -> type[AbstractStrategy]:
-            cls._registry[name] = strategy_type, requires_data, has_params
+            cls._registry[name] = strategy_type, metadata or StrategyMetadata()
             return strategy_type
 
         return wrapper
 
     @classmethod
     def requires_data(cls, name: str) -> bool:
-        _, requires_data, _ = cls._registry.get(name)
-        return requires_data
+        _, metadata = cls._registry.get(name)
+        return metadata.requires_data
 
     @classmethod
-    def resolve(cls, name: str, params: dict) -> AbstractStrategy:
-        strategy_type, _, has_params = cls._registry.get(name)
-        return strategy_type(params) if has_params else strategy_type()
+    def resolve(cls, name: str, params: dict[str, str]) -> AbstractStrategy:
+        strategy_type, metadata = cls._registry.get(name)
+        return strategy_type(params) if metadata.has_params else strategy_type()
