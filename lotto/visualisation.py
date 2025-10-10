@@ -9,12 +9,12 @@ JAVASCRIPT = f'''document.body.style.backgroundColor = "{BACKGROUND_COLOR}";'''
 TEMPLATE = 'plotly_dark'
 
 
-def visualise_results(history: list[GameRecord]) -> None:
+def visualise_results(history: list[GameRecord], strategy_name: str) -> None:
     fig = make_subplots(rows=2, shared_xaxes=True)
 
     fig.update_layout(
         hovermode='x unified',
-        title='Lotto & Lotto Plus draw results',
+        title=f'<b>Lotto & Lotto Plus draw results - {strategy_name}</b>',
         legend={'groupclick': 'toggleitem'},
         xaxis2_title='draw date',
         yaxis1_title='lotto matches',

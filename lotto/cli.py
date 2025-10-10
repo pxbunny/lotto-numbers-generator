@@ -83,8 +83,8 @@ def _get_metrics_table(title: str, report: BacktestReport) -> Table:
 
 @_app.command()
 def run_backtest(
-    strategy: Annotated[str, typer.Option('--strategy', '-s')],
-    param: Annotated[list[str] | None, typer.Option('--param', '-p')] = None,
+    strategy_name: Annotated[str, typer.Option('--strategy', '-s')],
+    params: Annotated[list[str] | None, typer.Option('--param', '-p')] = None,
     date_from: Annotated[str | None, typer.Option('--date-from')] = None,
     date_to: Annotated[str | None, typer.Option('--date-to')] = None,
     top: Annotated[int | None, typer.Option('--top', min=1)] = None,
@@ -94,8 +94,8 @@ def run_backtest(
     with _console.status('Fetching data', spinner=_spinner_type, spinner_style=_spinner_style):
         data = lotto_client.get_draw_results(date_from, date_to, top)
 
-    params = _parse_params(param)
-    strategy = StrategyRegistry.resolve(strategy, params)
+    params_dict = _parse_params(params)
+    strategy = StrategyRegistry.resolve(strategy_name, params_dict)
     backtest = BacktestEngine(strategy)
 
     results_iterator = backtest.results_gen(data)
@@ -116,21 +116,21 @@ def run_backtest(
     _console.print(Columns([lotto_table, lotto_plus_table]))
     _console.print()
 
-    visualise_results(results)
+    visualise_results(results, strategy_name)
 
 
 @_app.command()
 def generate_numbers(
-    strategy: Annotated[str, typer.Option('--strategy', '-s')],
-    param: Annotated[list[str] | None, typer.Option('--param', '-p')] = None,
+    strategy_name: Annotated[str, typer.Option('--strategy', '-s')],
+    params: Annotated[list[str] | None, typer.Option('--param', '-p')] = None,
     date_from: Annotated[str | None, typer.Option('--date-from')] = None,
     date_to: Annotated[str | None, typer.Option('--date-to')] = None,
     top: Annotated[int, typer.Option('--top', min=1)] = 100,
 ) -> None:
     _validate_date_options(date_from, date_to)
 
-    params = _parse_params(param)
-    requires_data = StrategyRegistry.requires_data(strategy)
+    params_dict = _parse_params(params)
+    requires_data = StrategyRegistry.requires_data(strategy_name)
 
     if requires_data:
         with _console.status('Fetching data', spinner=_spinner_type, spinner_style=_spinner_style):
@@ -138,7 +138,7 @@ def generate_numbers(
     else:
         data = []
 
-    strategy = StrategyRegistry.resolve(strategy, params)
+    strategy = StrategyRegistry.resolve(strategy_name, params_dict)
     strategy.prepare_data(data)
     numbers = strategy.generate_numbers()
 
