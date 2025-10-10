@@ -5,7 +5,7 @@ from .core import GameRecord, GameType
 
 BACKGROUND_COLOR = '#111111'
 DEFAULT_CONFIG = {'displaylogo': False}
-JAVASCRIPT = f'''document.body.style.backgroundColor = "{BACKGROUND_COLOR}";'''
+JAVASCRIPT = f'''document.body.style.backgroundColor = "{BACKGROUND_COLOR}"; document.title = "Lotto Results";'''
 TEMPLATE = 'plotly_dark'
 
 
