@@ -120,6 +120,16 @@ def run_backtest(
 
 
 @_app.command()
+def list_strategies() -> None:
+    strategies = StrategyRegistry.list_strategies()
+
+    _console.print('Available Strategies:', style='bold')
+
+    for strategy in strategies:
+        _console.print(f'- {strategy}')
+
+
+@_app.command()
 def generate_numbers(
     strategy_name: Annotated[str, typer.Option('--strategy', '-s')],
     params: Annotated[list[str] | None, typer.Option('--param', '-p')] = None,

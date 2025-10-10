@@ -61,6 +61,10 @@ class StrategyRegistry:
         return metadata.requires_data
 
     @classmethod
+    def list_strategies(cls) -> list[str]:
+        return list(cls._registry.keys())
+
+    @classmethod
     def resolve(cls, name: str, params: dict[str, str]) -> AbstractStrategy:
         strategy_type, metadata = cls._registry.get(name)
         return strategy_type(params) if metadata.has_params else strategy_type()
