@@ -8,6 +8,7 @@ from rich.console import Console
 from rich.progress import BarColumn, Progress, TaskProgressColumn, TextColumn
 from rich.style import Style
 from rich.table import Table
+from rich.text import Text
 
 from . import lotto_client
 from .core import GameType, StrategyRegistry
@@ -20,12 +21,13 @@ _app = typer.Typer(name=config.app.name, add_completion=False, no_args_is_help=T
 _console = Console()
 
 _spinner_type = 'arc'
-_style = Style(color='bright_cyan')
+_color = 'bright_cyan'
 
 _progress = Progress(
     TextColumn('{task.description}'),
-    BarColumn(style=Style(), complete_style=_style, finished_style=_style, pulse_style=_style),
+    BarColumn(style=Style(), complete_style=_color, finished_style=_color, pulse_style=_color),
     TaskProgressColumn(text_format='{task.percentage:>3.0f}%'),
+    console=_console,
     transient=True,
 )
 
@@ -53,9 +55,10 @@ def _parse_params(params: str | None) -> dict[str, str]:
 
 
 def _get_metrics_table(title: str, report: BacktestReport) -> Table:
-    table = Table(title=title)
-    table.add_column('Metric', style='cyan', no_wrap=True)
-    table.add_column('Value', style='magenta', justify='right')
+    table = Table(title=Text(title, style='bold'))
+
+    table.add_column(Text('Metric', justify='center'), no_wrap=True)
+    table.add_column('Value', justify='right', style=_color)
 
     ba = report.basic_accuracy
 
@@ -98,7 +101,7 @@ def run_backtest(
 ) -> None:
     _validate_date_options(date_from, date_to)
 
-    with _console.status('Fetching data', spinner=_spinner_type, spinner_style=_style):
+    with _console.status('Fetching data', spinner=_spinner_type, spinner_style=_color):
         data = lotto_client.get_draw_results(date_from, date_to, top)
 
     params_dict = _parse_params(params)
@@ -124,7 +127,7 @@ def run_backtest(
     lotto_plus_table = _get_metrics_table('Lotto Plus - metrics', lotto_plus_metrics)
 
     _console.print()
-    _console.print(Columns([lotto_table, lotto_plus_table]))
+    _console.print(Columns([lotto_table, lotto_plus_table], padding=(0, 2)))
     _console.print()
 
     visualise_results(results, strategy_name)
@@ -154,7 +157,7 @@ def generate_numbers(
     requires_data = StrategyRegistry.requires_data(strategy_name)
 
     if requires_data:
-        with _console.status('Fetching data', spinner=_spinner_type, spinner_style=_style):
+        with _console.status('Fetching data', spinner=_spinner_type, spinner_style=_color):
             data = lotto_client.get_draw_results(date_from, date_to, top)
     else:
         data = []
