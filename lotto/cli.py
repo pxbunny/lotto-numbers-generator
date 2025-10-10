@@ -95,10 +95,7 @@ def run_backtest(
         data = lotto_client.get_draw_results(date_from, date_to, top)
 
     params = _parse_params(param)
-
-    strategy_registry = StrategyRegistry(data)
-    strategy = strategy_registry.resolve(strategy, params)
-
+    strategy = StrategyRegistry.resolve(strategy, params)
     backtest = BacktestEngine(strategy)
 
     results_iterator = backtest.results_gen(data)
@@ -141,10 +138,10 @@ def generate_numbers(
     else:
         data = []
 
-    strategy_registry = StrategyRegistry(data)
-    strategy = strategy_registry.resolve(strategy, params)
-
+    strategy = StrategyRegistry.resolve(strategy, params)
+    strategy.prepare_data(data)
     numbers = strategy.generate_numbers()
+
     _console.print(f'Generated numbers: [bold green]{", ".join(map(str, numbers))}[/]')
 
 

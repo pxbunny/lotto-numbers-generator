@@ -1,17 +1,14 @@
 import random
 
-from ..core import AbstractStrategy, StrategyRegistry
+from ..core import AbstractStrategy, LottoDrawRecord, StrategyRegistry
 
 
 @StrategyRegistry.register('baseline', requires_data=False, has_params=False)
 class Baseline(AbstractStrategy):
-    _POOL_MAX = 49
-    _TAKE = 6
-
-    def __init__(self) -> None:
-        super().__init__([], {})
+    def prepare_data(self, _: list[LottoDrawRecord]) -> None:
+        pass
 
     def generate_numbers(self) -> list[int]:
-        numbers = random.sample(range(1, self._POOL_MAX + 1), k=self._TAKE)
+        numbers = random.sample(range(1, self.POOL_MAX + 1), k=self.TAKE)
         numbers.sort()
         return numbers

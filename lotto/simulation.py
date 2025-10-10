@@ -20,6 +20,8 @@ class BacktestEngine:
         self._history = []
 
         for record in data:
+            data_chunk = data[: data.index(record)]
+            self._strategy.prepare_data(data_chunk)
             generated_numbers = self._strategy.generate_numbers()
 
             datasets = [

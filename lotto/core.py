@@ -26,9 +26,12 @@ class GameRecord:
 
 
 class AbstractStrategy(ABC):
-    def __init__(self, data: list[LottoDrawRecord], params: dict) -> None:
-        self._data = data
-        self._params = params
+    POOL_MAX = 49
+    TAKE = 6
+
+    @abstractmethod
+    def prepare_data(self, data: list[LottoDrawRecord]) -> None:
+        raise NotImplementedError
 
     @abstractmethod
     def generate_numbers(self) -> list[int]:
@@ -37,9 +40,6 @@ class AbstractStrategy(ABC):
 
 class StrategyRegistry:
     _registry: dict[str, tuple[type[AbstractStrategy], bool, bool]] = {}
-
-    def __init__(self, data: list[LottoDrawRecord] | None = None) -> None:
-        self._data = data if data is not None else []
 
     @classmethod
     def register(cls, name: str, *, requires_data: bool = True, has_params: bool = True) -> callable:
@@ -54,15 +54,7 @@ class StrategyRegistry:
         _, requires_data, _ = cls._registry.get(name)
         return requires_data
 
-    def resolve(self, name: str, params: dict) -> AbstractStrategy:
-        strategy_type, requires_data, has_params = self._registry.get(name)
-
-        match (requires_data, has_params):
-            case (True, True):
-                return strategy_type(self._data, params)
-            case (True, False):
-                return strategy_type(self._data)
-            case (False, True):
-                return strategy_type(params)
-            case (False, False):
-                return strategy_type()
+    @classmethod
+    def resolve(cls, name: str, params: dict) -> AbstractStrategy:
+        strategy_type, _, has_params = cls._registry.get(name)
+        return strategy_type(params) if has_params else strategy_type()
