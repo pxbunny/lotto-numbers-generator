@@ -5,7 +5,7 @@ from typing import Annotated
 import typer
 from rich.columns import Columns
 from rich.console import Console
-from rich.progress import track
+from rich.progress import BarColumn, Progress, TaskProgressColumn, TextColumn
 from rich.style import Style
 from rich.table import Table
 
@@ -20,7 +20,14 @@ _app = typer.Typer(name=config.app.name, add_completion=False, no_args_is_help=T
 _console = Console()
 
 _spinner_type = 'arc'
-_spinner_style = Style(color='bright_cyan', bold=True)
+_style = Style(color='bright_cyan')
+
+_progress = Progress(
+    TextColumn('{task.description}'),
+    BarColumn(style=Style(), complete_style=_style, finished_style=_style, pulse_style=_style),
+    TaskProgressColumn(text_format='{task.percentage:>3.0f}%'),
+    transient=True,
+)
 
 
 def _is_date_str_valid(date_str: str) -> bool:
@@ -91,7 +98,7 @@ def run_backtest(
 ) -> None:
     _validate_date_options(date_from, date_to)
 
-    with _console.status('Fetching data', spinner=_spinner_type, spinner_style=_spinner_style):
+    with _console.status('Fetching data', spinner=_spinner_type, spinner_style=_style):
         data = lotto_client.get_draw_results(date_from, date_to, top)
 
     params_dict = _parse_params(params)
@@ -102,8 +109,12 @@ def run_backtest(
     total_games = reduce(lambda x, y: x + (2 if y.plus_numbers else 1), data, 0)
     results = []
 
-    for result in track(results_iterator, 'Backtest', total_games, console=_console):
-        results.append(result)
+    with _progress:
+        task = _progress.add_task('Backtest:', total=total_games)
+
+        for result in results_iterator:
+            results.append(result)
+            _progress.advance(task)
 
     metrics_calculator = MetricsCalculator(backtest.history)
     lotto_metrics = metrics_calculator.generate_report(GameType.LOTTO)
@@ -143,7 +154,7 @@ def generate_numbers(
     requires_data = StrategyRegistry.requires_data(strategy_name)
 
     if requires_data:
-        with _console.status('Fetching data', spinner=_spinner_type, spinner_style=_spinner_style):
+        with _console.status('Fetching data', spinner=_spinner_type, spinner_style=_style):
             data = lotto_client.get_draw_results(date_from, date_to, top)
     else:
         data = []
