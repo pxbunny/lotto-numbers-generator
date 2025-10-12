@@ -91,8 +91,8 @@ def _get_metrics_table(title: str, report: BacktestReport) -> Table:
     return table
 
 
-@_app.command()
-def run_backtest(
+@_app.command(name='simulate')
+def run_simulation(
     strategy_name: Annotated[str, typer.Option('--strategy', '-s')],
     params: Annotated[list[str] | None, typer.Option('--param', '-p')] = None,
     date_from: Annotated[str | None, typer.Option('--date-from')] = None,
@@ -133,7 +133,7 @@ def run_backtest(
     visualise_results(results, strategy_name)
 
 
-@_app.command()
+@_app.command(name='strategies')
 def list_strategies() -> None:
     strategies = StrategyRegistry.list_strategies()
 
@@ -143,7 +143,7 @@ def list_strategies() -> None:
         _console.print(f'- {strategy}')
 
 
-@_app.command()
+@_app.command(name='generate')
 def generate_numbers(
     strategy_name: Annotated[str, typer.Option('--strategy', '-s')],
     params: Annotated[list[str] | None, typer.Option('--param', '-p')] = None,

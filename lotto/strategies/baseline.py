@@ -8,7 +8,7 @@ _metadata = StrategyMetadata(
 )
 
 
-@StrategyRegistry.register('baseline', _metadata)
+@StrategyRegistry.register('random', _metadata)
 class Baseline(AbstractStrategy):
     def prepare_data(self, _: list[LottoDrawRecord]) -> None:
         pass
