@@ -22,7 +22,6 @@ class BacktestEngine:
         for record in data:
             data_chunk = data[: data.index(record)]
             self._strategy.prepare_data(data_chunk)
-            generated_numbers = self._strategy.generate_numbers()
 
             datasets = [
                 (GameType.LOTTO, record.lotto_numbers),
@@ -30,16 +29,10 @@ class BacktestEngine:
             ]
 
             for game_type, draw_result in datasets:
-                yield self._handle_game(record.draw_date, game_type, draw_result, generated_numbers)
+                yield self._handle_game(record.draw_date, game_type, draw_result)
 
-    def _handle_game(
-        self,
-        draw_date: datetime.date,
-        game_type: GameType,
-        draw_result: list[int],
-        generated_numbers: list[int] | None = None,
-    ) -> GameRecord:
-        generated_numbers = generated_numbers or self._strategy.generate_numbers()
+    def _handle_game(self, draw_date: datetime.date, game_type: GameType, draw_result: list[int]) -> GameRecord:
+        generated_numbers = self._strategy.generate_numbers()
         matches = self._count_matches(draw_result, generated_numbers)
 
         new_record = GameRecord(
