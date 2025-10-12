@@ -1,10 +1,9 @@
 from collections import Counter
-from typing import Any
 
 from ..core import AbstractStrategy, LottoDrawRecord, StrategyRegistry
 
-default_params: dict[str, Any] = {
-    'lookback': 100,
+default_params: dict[str, str] = {
+    'lookback': '100',
 }
 
 
