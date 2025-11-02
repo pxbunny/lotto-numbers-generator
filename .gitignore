@@ -164,4 +164,5 @@ cython_debug/
 # Other files and directories
 config.yaml
 **/data/*.csv
-TODOs.txt
+
+TODOs.md
