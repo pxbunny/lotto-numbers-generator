@@ -25,10 +25,10 @@ rm -rf $root_dir/dist
 
 pyinstaller $root_dir/lotto/__main__.py \
   --name $CLI_APP_NAME \
+  --exclude-module pyinstaller \
   --distpath $root_dir/dist \
   --workpath $root_dir/build \
-  --log-level=WARN \
-  --exclude-module pyinstaller
+  --log-level WARN
 
 echo "Removing existing installation at $CLI_APP_INSTALLATION_DIR..."
 
