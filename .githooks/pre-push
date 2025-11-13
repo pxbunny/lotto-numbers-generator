@@ -8,4 +8,8 @@ echo -e "\n✨ Running unit tests..."
 
 # pytest ./tests
 
+echo -e "\n🔧 Installing/updating app on this computer..."
+
+./install.sh
+
 echo -e "\n🎉 Pre-push status: success 🎉\n"
