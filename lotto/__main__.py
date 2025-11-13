@@ -1,7 +1,7 @@
 import importlib
 import pkgutil
 
-from .cli import run_typer_app
+from lotto.cli import run_typer_app
 
 
 def run_modules_discovery(package: str) -> None:
